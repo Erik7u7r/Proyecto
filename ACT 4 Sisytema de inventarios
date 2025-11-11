@@ -1,0 +1,124 @@
+<?php
+// ==========================================
+// Clase abstracta Producto
+// Define los atributos y métodos comunes
+// ==========================================
+abstract class Producto {
+    protected $nombre;
+    protected $precio;
+    protected $stock;
+
+    public function __construct($nombre, $precio, $stock) {
+        $this->nombre = $nombre;
+        $this->precio = $precio;
+        $this->stock = $stock;
+    }
+
+    // Método abstracto: cada subclase debe implementarlo
+    abstract public function mostrarInfo();
+    abstract public function calcularIVA();
+}
+
+// ==========================================
+// Interfaz IDescuento
+// Define un comportamiento adicional
+// ==========================================
+interface IDescuento {
+    public function aplicarDescuento($porcentaje);
+}
+
+// ==========================================
+// Subclase Electrónico
+// ==========================================
+class Electronico extends Producto implements IDescuento {
+    private $garantia; // en meses
+
+    public function __construct($nombre, $precio, $stock, $garantia) {
+        parent::__construct($nombre, $precio, $stock);
+        $this->garantia = $garantia;
+    }
+
+    public function mostrarInfo() {
+        echo "📱 Electrónico: {$this->nombre} | Precio: {$this->precio} | Stock: {$this->stock} | Garantía: {$this->garantia} meses<br>";
+    }
+
+    public function calcularIVA() {
+        return $this->precio * 0.16; // IVA del 16%
+    }
+
+    public function aplicarDescuento($porcentaje) {
+        $this->precio -= $this->precio * ($porcentaje / 100);
+    }
+}
+
+// ==========================================
+// Subclase Alimento
+// ==========================================
+class Alimento extends Producto {
+    private $caducidad;
+
+    public function __construct($nombre, $precio, $stock, $caducidad) {
+        parent::__construct($nombre, $precio, $stock);
+        $this->caducidad = $caducidad;
+    }
+
+    public function mostrarInfo() {
+        echo "🍎 Alimento: {$this->nombre} | Precio: {$this->precio} | Stock: {$this->stock} | Caduca: {$this->caducidad}<br>";
+    }
+
+    public function calcularIVA() {
+        return $this->precio * 0.08; // IVA reducido
+    }
+}
+
+// ==========================================
+// Subclase Ropa
+// ==========================================
+class Ropa extends Producto implements IDescuento {
+    private $talla;
+
+    public function __construct($nombre, $precio, $stock, $talla) {
+        parent::__construct($nombre, $precio, $stock);
+        $this->talla = $talla;
+    }
+
+    public function mostrarInfo() {
+        echo "👕 Ropa: {$this->nombre} | Precio: {$this->precio} | Stock: {$this->stock} | Talla: {$this->talla}<br>";
+    }
+
+    public function calcularIVA() {
+        return $this->precio * 0.10; // IVA medio
+    }
+
+    public function aplicarDescuento($porcentaje) {
+        $this->precio -= $this->precio * ($porcentaje / 100);
+    }
+}
+
+// ==========================================
+// Programa principal
+// Demostración del Polimorfismo
+// ==========================================
+
+$productos = [
+    new Electronico("Laptop HP", 15000, 5, 24),
+    new Alimento("Manzana", 10, 100, "2025-12-01"),
+    new Ropa("Camiseta", 250, 20, "M")
+];
+
+echo "<h2>🧾 Inventario de Productos</h2>";
+
+foreach ($productos as $producto) {
+    $producto->mostrarInfo();
+    echo "IVA: " . $producto->calcularIVA() . "<br><br>";
+}
+
+// Aplicar descuento solo a los que implementan la interfaz
+echo "<h2>💸 Aplicando descuentos</h2>";
+foreach ($productos as $producto) {
+    if ($producto instanceof IDescuento) {
+        $producto->aplicarDescuento(10);
+    }
+    $producto->mostrarInfo();
+}
+?>
